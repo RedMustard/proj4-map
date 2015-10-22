@@ -3,37 +3,31 @@
 	<title>Map</title>
 	</head>
 
-	<body>
-	<script type="text/javascript">
-	var SAMPLE_POST = HOST_URL + '/geocoding/v1/address?key=7L20FvaHiadWa4msLEAps4GGTvfMGVn5 &location=Eugene,OR&callback=renderGeocode';
-
-function showBasicURL() {
-    var safe = SAMPLE_POST;
-    document.getElementById('basicSampleUrl').innerHTML = safe.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-};
-
-function doClick() {
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    showBasicURL();
-    var newURL = SAMPLE_POST.replace('7L20FvaHiadWa4msLEAps4GGTvfMGVn5 ', APP_KEY);
-    script.src = newURL;
-    document.body.appendChild(script);
-};
-
-function renderGeocode(response) {
-    var html = '';
-    var i = 0;
-    var j = 0;
+	<link rel="stylesheet" href="map.css" />
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
 	
-	html = "<p>Location: ";
-	var location = response.results[0].locations[0];
-	html += location.adminArea5 + ", " + location.adminArea4 + ", " + location.adminArea3 + ", " + location.adminArea1 + "(" + location.latLng.lat + ", " + location.latLng.lng + ")";
-  	html += "</p>";
-    
-    document.getElementById('narrative').innerHTML = html;
-}
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
+	<script src="http://www.mapquestapi.com/sdk/leaflet/v2.s/mq-map.js?key=7L20FvaHiadWa4msLEAps4GGTvfMGVn5"></script>
+	<script src="http://www.mapquestapi.com/sdk/leaflet/v2.s/mq-geocoding.js?key=7L20FvaHiadWa4msLEAps4GGTvfMGVn5"></script>
 
-	</script>
+	<body>
+		<div id="map">
+			<script>
+				var geocode,
+					marker = L.marker(),
+					latlng;
+
+				map = L.map('map', {
+					layers: MQ.mapLayer(),
+					center: [44.0519,-123.0867],
+					zoom: 14 }).on('click', function(e) {
+		    		lat = e.latlng.lat;
+		    		lng = e.latlng.lng;
+		    		geocode = MQ.geocode().reverse(e.latlng).on('success', function(e) {
+		      		marker.setLatLng([lat,lng]).addTo(map).bindPopup(geocode.describeLocation(e.result.best)).openPopup();
+					});
+				});
+			</script>
+		</div>
 	</body>
 </html>
